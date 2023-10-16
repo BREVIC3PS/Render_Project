@@ -27,6 +27,15 @@
     <ClCompile Include="src\2.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\3.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Mesh\Mesh.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Mesh\Model.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\3.3.shader.vs">
@@ -56,6 +65,15 @@
     <None Include="shader\8.whiteLight.fs">
       <Filter>资源文件</Filter>
     </None>
+    <None Include="shader\lalala.glsl">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="shader\1.model_loading.vs">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="shader\1.model_loading.fs">
+      <Filter>资源文件</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\shader.h">
@@ -65,6 +83,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\camera.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Mesh\Mesh.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Mesh\Model.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
