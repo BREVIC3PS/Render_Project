@@ -21,5 +21,51 @@
     <ClCompile Include="src\glad.c">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\shader.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\2.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shader\3.3.shader.vs">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="shader\3.3.shader.fs">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="shader\4.1.texture.vs">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="shader\4.1.texture.fs">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="shader\7.3.camera.vs">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="shader\7.3.camera.fs">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="shader\8.light.vs">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="shader\8.light.fs">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="shader\8.whiteLight.fs">
+      <Filter>资源文件</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\shader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\stb_image.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\camera.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

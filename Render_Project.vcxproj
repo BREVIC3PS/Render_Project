@@ -156,7 +156,25 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\1.cpp" />
+    <ClCompile Include="src\2.cpp" />
     <ClCompile Include="src\glad.c" />
+    <ClCompile Include="src\shader.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\camera.h" />
+    <ClInclude Include="include\shader.h" />
+    <ClInclude Include="include\stb_image.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shader\3.3.shader.fs" />
+    <None Include="shader\3.3.shader.vs" />
+    <None Include="shader\4.1.texture.fs" />
+    <None Include="shader\4.1.texture.vs" />
+    <None Include="shader\7.3.camera.fs" />
+    <None Include="shader\7.3.camera.vs" />
+    <None Include="shader\8.light.fs" />
+    <None Include="shader\8.light.vs" />
+    <None Include="shader\8.whiteLight.fs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
