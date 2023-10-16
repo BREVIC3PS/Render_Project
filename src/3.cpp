@@ -80,11 +80,13 @@ int main()
     // -------------------------
     Shader ourShader("shader/1.model_loading.vs", "shader/1.model_loading.fs");
 
+    Shader lightCubeShader("shader/8.light.vs", "shader/8.whiteLight.fs");
+
     // load models
     // -----------
-    Model ourModel(("resources/objects/bugatti/bugatti.obj"));
+    Model ourModel(("resources/objects/nanosuit/nanosuit.obj"));
 
-
+    std::cout << "model loaded" << std::endl;
     // draw in wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
