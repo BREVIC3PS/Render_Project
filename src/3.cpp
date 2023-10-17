@@ -20,8 +20,8 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
 
 // settings
-const unsigned int SCR_WIDTH = 1600;
-const unsigned int SCR_HEIGHT = 1200;
+const unsigned int SCR_WIDTH = 1000;
+const unsigned int SCR_HEIGHT = 1000;
 
 // camera
 Camera camera(glm::vec3(5.0f, 5.0f, 10.0f));
@@ -48,7 +48,7 @@ int main()
 
     // glfw window creation
     // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Render_Project", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -86,7 +86,7 @@ int main()
 
     Shader lightCubeShader("shader/8.light.vs", "shader/8.whiteLight.fs");
     Light light;
-    glm::vec3 lightPos = glm::vec3(5.0f, 5.0f, -10.0f);
+    glm::vec3 lightPos = glm::vec3(5.0f, 10.0f, -10.0f);
     glm::vec3 white = glm::vec3(1.0f, 1.0f, 1.0f);
     light.setPosition(lightPos);
     light.setColor(white);
@@ -128,11 +128,13 @@ int main()
 
         // render the loaded model
         glm::mat4 model = glm::mat4(1.0f);
+        
+        model = glm::scale(model, glm::vec3(0.02f, 0.02f, 0.02f));	// it's a bit too big for our scene, so scale it down
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-        model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));	// it's a bit too big for our scene, so scale it down
+        model = glm::rotate(model, glm::radians((float)glfwGetTime()*20), glm::vec3(0.0f, 1.0f, 0.0f));
         ourShader.setMat4("model", model);
         ourShader.setVec3("viewPos", camera.Position);
-        glm::vec3 lightPos = glm::vec3(0.0f, 7.0f, 0.0f);
+        glm::vec3 lightPos = glm::vec3(0.0f, 10.0f, 0.0f);
         light.setPosition(lightPos);
         light.setLight(ourShader,camera);
         ourShader.setMaterial(MaterialType::EMERALD);
