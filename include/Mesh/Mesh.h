@@ -6,7 +6,9 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include "Light.h"
 #define MAX_BONE_INFLUENCE 4
+
 struct Vertex {
     // position
     glm::vec3 Position;
@@ -31,7 +33,7 @@ struct Texture {
 };
 
 class Shader;
-
+class Light;
 class Mesh {
 public:
     /*  网格数据  */
@@ -41,7 +43,7 @@ public:
     unsigned int VAO;
     /*  函数  */
     Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Texture>& textures);
-    void Draw(Shader &shader);
+    void Draw(Shader &shader, Light &light);
 private:
     /*  渲染数据  */
     unsigned int VBO, EBO;

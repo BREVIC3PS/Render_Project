@@ -116,3 +116,11 @@ void Shader::setVec3(const std::string& name, float x, float y, float z) const
 {
     glUniform3f(glGetUniformLocation(ID, name.c_str()), x, y, z);
 }
+
+void Shader::setMaterial(MaterialType type)
+{
+    Material m = materials[type];
+    setVec3("material.texture_diffuse1", m.Diffuse);
+    setVec3("material.texture_specular1", m.Specular);
+    setFloat("material.shininess", m.Shininess);
+}

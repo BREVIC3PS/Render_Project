@@ -159,12 +159,15 @@
     <ClCompile Include="src\2.cpp" />
     <ClCompile Include="src\3.cpp" />
     <ClCompile Include="src\glad.c" />
+    <ClCompile Include="src\Light.cpp" />
     <ClCompile Include="src\Mesh\Mesh.cpp" />
     <ClCompile Include="src\Mesh\Model.cpp" />
     <ClCompile Include="src\shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\camera.h" />
+    <ClInclude Include="include\Light.h" />
+    <ClInclude Include="include\Materials.h" />
     <ClInclude Include="include\Mesh\Mesh.h" />
     <ClInclude Include="include\Mesh\Model.h" />
     <ClInclude Include="include\shader.h" />
@@ -182,6 +185,7 @@
     <None Include="shader\8.light.fs" />
     <None Include="shader\8.light.vs" />
     <None Include="shader\8.whiteLight.fs" />
+    <None Include="shader\bugatti.fs" />
     <None Include="shader\lalala.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -16,7 +16,7 @@ public:
     {
         loadModel(path);
     }
-    void Draw(Shader &shader);
+    void Draw(Shader &shader, Light& light);
 private:
     /*  模型数据  */
     std::vector<Mesh> meshes;

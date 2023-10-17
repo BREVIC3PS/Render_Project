@@ -2,7 +2,7 @@
 #define SHADER_H
 
 #include <glad/glad.h>; // 包含glad来获取所有的必须OpenGL头文件
-
+#include <Materials.h>
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -29,6 +29,7 @@ public:
     void setMat4(const std::string& name, glm::mat4 &value) const;
     void setVec3(const std::string& name, glm::vec3 &value) const;
     void setVec3(const std::string& name, float x, float y, float z) const;
+    void setMaterial(MaterialType type);
 };
 
 #endif

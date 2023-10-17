@@ -11,6 +11,8 @@
 
 #include <iostream>
 #include <stb_image.h>
+#include <Light.h>
+#include "Materials.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -22,7 +24,7 @@ const unsigned int SCR_WIDTH = 1600;
 const unsigned int SCR_HEIGHT = 1200;
 
 // camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(5.0f, 5.0f, 10.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -61,6 +63,8 @@ int main()
     // tell GLFW to capture our mouse
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
+    unsigned int VAO, VBO;
+    //configureLightVAO(VAO,VBO);
     // glad: load all OpenGL function pointers
     // ---------------------------------------
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -78,13 +82,17 @@ int main()
 
     // build and compile shaders
     // -------------------------
-    Shader ourShader("shader/1.model_loading.vs", "shader/1.model_loading.fs");
+    Shader ourShader("shader/8.light.vs", "shader/1.model_loading.fs");
 
     Shader lightCubeShader("shader/8.light.vs", "shader/8.whiteLight.fs");
-
+    Light light;
+    glm::vec3 lightPos = glm::vec3(5.0f, 5.0f, -10.0f);
+    glm::vec3 white = glm::vec3(1.0f, 1.0f, 1.0f);
+    light.setPosition(lightPos);
+    light.setColor(white);
     // load models
     // -----------
-    Model ourModel(("resources/objects/nanosuit/nanosuit.obj"));
+    Model ourModel(("resources/objects/tyranno1/RaptorALL.fbx"));
 
     std::cout << "model loaded" << std::endl;
     // draw in wireframe
@@ -121,10 +129,25 @@ int main()
         // render the loaded model
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+        model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));	// it's a bit too big for our scene, so scale it down
         ourShader.setMat4("model", model);
-        ourModel.Draw(ourShader);
+        ourShader.setVec3("viewPos", camera.Position);
+        glm::vec3 lightPos = glm::vec3(0.0f, 7.0f, 0.0f);
+        light.setPosition(lightPos);
+        light.setLight(ourShader,camera);
+        ourShader.setMaterial(MaterialType::EMERALD);
+        ourModel.Draw(ourShader,light);
 
+        //also draw the lamp object
+        glm::vec3 lightColor = glm::vec3(1.0f);
+        lightCubeShader.use();
+        lightCubeShader.setMat4("projection", projection);
+        lightCubeShader.setVec3("color", lightColor);
+        lightCubeShader.setMat4("view", view);
+        model = glm::scale(model, glm::vec3(0.1f)); // a smaller cube
+        lightCubeShader.setMat4("model", model);
+
+        light.Draw(lightCubeShader);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -153,6 +176,10 @@ void processInput(GLFWwindow* window)
         camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        camera.ProcessKeyboard(UP, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+        camera.ProcessKeyboard(DOWN, deltaTime);
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -193,3 +220,5 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     camera.ProcessMouseScroll(static_cast<float>(yoffset));
 }
+
+

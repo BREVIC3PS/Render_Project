@@ -4,12 +4,13 @@
 #include "Mesh/Mesh.h"
 #include "shader.h"
 #include "stb_image.h"
+#include <Light.h>
 using namespace std; 
 
-void Model::Draw(Shader &shader)
+void Model::Draw(Shader &shader, Light &light)
 {
 	for (unsigned int i = 0; i < meshes.size(); i++)
-		meshes[i].Draw(shader);
+		meshes[i].Draw(shader, light);
 }
 
 void Model::loadModel(const std::string &path)
