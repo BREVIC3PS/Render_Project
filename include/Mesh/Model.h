@@ -11,22 +11,25 @@ class Model
 {
 public:
 
-    /*  函数   */
+    /*  Functions   */
     Model(const std::string & path, bool gamma = false) : gammaCorrection(gamma)
     {
         loadModel(path);
     }
     void Draw(Shader &shader, Light& light);
 private:
-    /*  模型数据  */
+    /*  Model Data  */
     std::vector<Mesh> meshes;
     std::string directory;
     std::vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
     bool gammaCorrection;
-    /*  函数   */
+    /*  Functions   */
     void loadModel(const std::string &path);
     void processNode(aiNode* node, const aiScene* scene);
     Mesh processMesh(aiMesh* mesh, const aiScene* scene);
+    void ProcessMaterials(aiMesh* mesh, const aiScene* scene, std::vector<Texture>& textures);
+    void ProcessFaces(aiMesh* mesh, std::vector<unsigned int>& indices);
+    void ProcessVertices(aiMesh* mesh, std::vector<Vertex>& vertices);
     std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type,
         const std::string& typeName);
 };

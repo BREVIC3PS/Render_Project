@@ -53,6 +53,7 @@ void Mesh::Draw(Shader& shader, Light &light)
             glBindTexture(GL_TEXTURE_2D, textures[i].id);
         }
     else {
+        std::cout << "TEXTURE NOT FOUND!" << endl;
         glm::vec3 defaultmaterial_diffuse((0.1), (0.1), (0.1));
         glm::vec3 defaultmaterial_specular1((1.0), (1.0), (1.0));
         glm::vec3 defaultmaterial((0.5), (0.5), (0.5));
@@ -66,6 +67,7 @@ void Mesh::Draw(Shader& shader, Light &light)
     //light.setLight(shader);
 
     // draw mesh
+    // todo: can be parallelized
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
