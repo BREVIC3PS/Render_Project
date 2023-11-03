@@ -39,6 +39,9 @@
     <ClCompile Include="src\Light.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="test.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\3.3.shader.vs">
@@ -94,14 +97,14 @@
     <ClInclude Include="include\Mesh\Mesh.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="include\Mesh\Model.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="include\Light.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="include\Materials.h">
       <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Mesh\Model.h">
+      <Filter>Assests</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
