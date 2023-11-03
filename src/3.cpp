@@ -82,7 +82,7 @@ int main()
 
     // build and compile shaders
     // -------------------------
-    Shader ourShader("shader/8.light.vs", "shader/1.model_loading.fs");
+    Shader ourShader("shader/8.light.vs", "shader/bugatti.fs");
 
     Shader lightCubeShader("shader/8.light.vs", "shader/8.whiteLight.fs");
     Light light;
@@ -92,7 +92,7 @@ int main()
     light.setColor(white);
     // load models
     // -----------
-    Model ourModel(("resources/objects/tyranno1/RaptorALL.fbx"));
+    Model ourModel(("resources/objects/bugatti/bugatti.obj"));
 
     std::cout << "model loaded" << std::endl;
     // draw in wireframe
@@ -128,7 +128,7 @@ int main()
 
         // render the loaded model
         glm::mat4 model = glm::mat4(1.0f);
-        
+        model = glm::rotate(model, glm::radians(90.f), glm::vec3(1.0f, 0.0f, 0.0f));
         model = glm::scale(model, glm::vec3(0.02f, 0.02f, 0.02f));	// it's a bit too big for our scene, so scale it down
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
         model = glm::rotate(model, glm::radians((float)glfwGetTime()*20), glm::vec3(0.0f, 1.0f, 0.0f));
