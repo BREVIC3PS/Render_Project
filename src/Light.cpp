@@ -14,8 +14,8 @@ Light::Light()
 void Light::setLight(Shader& objectShader, Camera &camera)
 {
     glm::vec3 lightColor = glm::vec3(1.0f);
-    glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f); // 降低影响
-    glm::vec3 ambientColor = diffuseColor * glm::vec3(0.5f); // 很低的影响
+    glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f); 
+    glm::vec3 ambientColor = diffuseColor * glm::vec3(0.5f); 
 
     /*
         Here we set all the uniforms for the 5/6 types of lights we have. We have to set them manually and index
