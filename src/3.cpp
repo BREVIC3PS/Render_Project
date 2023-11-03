@@ -94,6 +94,10 @@ int main()
     // -----------
     Model ourModel(("resources/objects/bugatti/bugatti.obj"));
 
+    //test git
+    Model ourModel(("resources/objects/bugatti/bugatti.obj"));
+    // test.test(test);
+
     std::cout << "model loaded" << std::endl;
     // draw in wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -223,4 +227,4 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
     camera.ProcessMouseScroll(static_cast<float>(yoffset));
 }
 
-
+// testtest
