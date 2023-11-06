@@ -155,9 +155,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="5.cpp" />
     <ClCompile Include="src\1.cpp" />
     <ClCompile Include="src\2.cpp" />
     <ClCompile Include="src\3.cpp" />
+    <ClCompile Include="src\4.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\Light.cpp" />
     <ClCompile Include="src\Mesh\Mesh.cpp" />
@@ -166,6 +168,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\camera.h" />
+    <ClInclude Include="include\InputControl.h" />
     <ClInclude Include="include\Light.h" />
     <ClInclude Include="include\Materials.h" />
     <ClInclude Include="include\Mesh\Mesh.h" />
@@ -174,8 +177,15 @@
     <ClInclude Include="include\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shader\1.advanced_lighting.fs" />
+    <None Include="shader\1.advanced_lighting.vs" />
     <None Include="shader\1.model_loading.fs" />
     <None Include="shader\1.model_loading.vs" />
+    <None Include="shader\10.2.instancing.fs" />
+    <None Include="shader\10.2.instancing.vs" />
+    <None Include="shader\10.3.asteroids.fs" />
+    <None Include="shader\10.3.asteroids.vs" />
+    <None Include="shader\2.gamma_correction.fs" />
     <None Include="shader\3.3.shader.fs" />
     <None Include="shader\3.3.shader.vs" />
     <None Include="shader\4.1.texture.fs" />
