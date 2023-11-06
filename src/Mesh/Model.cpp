@@ -7,10 +7,22 @@
 #include <Light.h>
 using namespace std; 
 
-void Model::Draw(Shader &shader, Light &light)
+void Model::Draw(Shader &shader)
 {
 	for (unsigned int i = 0; i < meshes.size(); i++)
-		meshes[i].Draw(shader, light);
+		meshes[i].Draw(shader);
+}
+
+void Model::PrintNumbers()
+{
+    cout << "Number of Meshes: " << meshes.size() << endl;
+    for (unsigned int i = 0; i < meshes.size(); i++) {
+
+        cout << "Mesh " << i << endl<<
+        "Number of Faces: " << meshes[i].indices.size() << endl <<
+        "Number of Vertices: " << meshes[i].vertices.size() << endl;
+    }
+    
 }
 
 void Model::loadModel(const std::string &path)

@@ -24,7 +24,7 @@ Mesh::Mesh(const vector<Vertex> &vertices, const vector<unsigned int> &indices, 
     setupMesh();
 }
 
-void Mesh::Draw(Shader& shader, Light &light)
+void Mesh::Draw(Shader& shader)
 {
     // bind appropriate textures
     unsigned int diffuseNr = 1;
