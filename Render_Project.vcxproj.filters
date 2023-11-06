@@ -121,9 +121,6 @@
     <ClInclude Include="include\Mesh\Mesh.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="include\Mesh\Model.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="include\Light.h">
       <Filter>Header</Filter>
     </ClInclude>
