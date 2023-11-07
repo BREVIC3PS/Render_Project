@@ -53,7 +53,7 @@ void Model::processNode(aiNode* node, const aiScene* scene) {
         #pragma omp single
         {
             // 단일 스레드가 처음 작업을 생성하기 위해 이 부분을 실행합니다.
-            processNodeTasks(node, scene);
+            Model::processNodeTasks(node, scene);
         }
     } // 병렬 영역의 끝
 }
