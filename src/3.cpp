@@ -91,7 +91,7 @@ int main()
     light.setColor(white);
     // load models
     // -----------
-    Model ourModel(("resources/objects/bugatti/bugatti.obj"));
+    Model ourModel(("C:\TeamProject\Render_Project\resources\objects\LionSculpture\lion.fbx"));
 
     std::cout << "model loaded" << std::endl;
     // draw in wireframe
