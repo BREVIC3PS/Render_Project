@@ -16,12 +16,13 @@ public:
     {
         loadModel(path);
     }
-    void Draw(Shader &shader, Light& light);
+    void Draw(Shader &shader);
+    void PrintNumbers();
+    std::vector<Mesh> meshes;
+    std::vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
 private:
     /*  Model Data  */
-    std::vector<Mesh> meshes;
     std::string directory;
-    std::vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
     bool gammaCorrection;
     /*  Functions   */
     void loadModel(const std::string &path);

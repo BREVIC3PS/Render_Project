@@ -43,7 +43,7 @@ public:
     unsigned int VAO;
     /*  º¯Êý  */
     Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Texture>& textures);
-    void Draw(Shader &shader, Light &light);
+    void Draw(Shader &shader);
 private:
     /*  äÖÈ¾Êý¾Ý  */
     unsigned int VBO, EBO;

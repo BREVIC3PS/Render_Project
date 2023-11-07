@@ -39,7 +39,10 @@
     <ClCompile Include="src\Light.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="test.cpp">
+    <ClCompile Include="src\4.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="5.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -83,6 +86,27 @@
     <None Include="shader\bugatti.fs">
       <Filter>Assests</Filter>
     </None>
+    <None Include="shader\10.2.instancing.vs">
+      <Filter>Assests</Filter>
+    </None>
+    <None Include="shader\10.2.instancing.fs">
+      <Filter>Assests</Filter>
+    </None>
+    <None Include="shader\10.3.asteroids.vs">
+      <Filter>Assests</Filter>
+    </None>
+    <None Include="shader\10.3.asteroids.fs">
+      <Filter>Assests</Filter>
+    </None>
+    <None Include="shader\1.advanced_lighting.vs">
+      <Filter>Assests</Filter>
+    </None>
+    <None Include="shader\1.advanced_lighting.fs">
+      <Filter>Assests</Filter>
+    </None>
+    <None Include="shader\2.gamma_correction.fs">
+      <Filter>Assests</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\shader.h">
@@ -103,8 +127,8 @@
     <ClInclude Include="include\Materials.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="include\Mesh\Model.h">
-      <Filter>Assests</Filter>
+    <ClInclude Include="include\InputControl.h">
+      <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
