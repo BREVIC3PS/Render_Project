@@ -155,11 +155,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="5.cpp" />
     <ClCompile Include="src\1.cpp" />
     <ClCompile Include="src\2.cpp" />
     <ClCompile Include="src\3.cpp" />
     <ClCompile Include="src\4.cpp" />
+    <ClCompile Include="src\5.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\Light.cpp" />
     <ClCompile Include="src\Mesh\Mesh.cpp" />
