@@ -9,3 +9,14 @@ Working in Progress!
 ![image](https://github.com/BREVIC3PS/Render_Project/blob/master/PathTracing/Demo/1.png)
 
 ![image](https://github.com/BREVIC3PS/Render_Project/blob/master/PathTracing/Demo/2.png)
+
+### Usage (For PathTracing):
+```
+cd PathTracing
+mkdir build
+cd build
+cmake ..
+make (or cmake --build . -j)
+./RayTracing (Or manually run RayTracing.exe)
+see the result -> binary.ppm
+```
