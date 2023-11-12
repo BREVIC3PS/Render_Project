@@ -46,6 +46,36 @@ void Model::loadModel(const std::string &path)
 
 //todo: change it into non-recursive (optional)
 //tode: change it into parallelized method
+void Model::processNode(aiNode* node, const aiScene* scene) {
+    // 병렬 영역 생성
+    #pragma omp parallel
+    {
+        #pragma omp single
+        {
+            // 단일 스레드가 처음 작업을 생성하기 위해 이 부분을 실행합니다.
+            Model::processNodeTasks(node, scene);
+        }
+    } // 병렬 영역의 끝
+}
+
+void Model::processNodeTasks(aiNode* node, const aiScene* scene) {
+    // 현재 노드에 위치한 각 메쉬 처리
+    for (unsigned int i = 0; i < node->mNumMeshes; i++) {
+        aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+        meshes.push_back(processMesh(mesh, scene)); // 스레드 안전성 확보 필요
+    }
+    // 자식 노드를 작업으로 처리
+    for (unsigned int i = 0; i < node->mNumChildren; i++) {
+        #pragma omp task firstprivate(i) // 'i'의 현재 값을 firstprivate로 캡처
+        {
+            processNodeTasks(node->mChildren[i], scene); // 재귀 작업 생성
+        }
+    }
+    #pragma omp taskwait // 하위 작업이 완료될 때까지 기다립니다.
+}
+
+
+/*
 void Model::processNode(aiNode* node, const aiScene* scene)
 {
     // process each mesh located at the current node
@@ -61,7 +91,7 @@ void Model::processNode(aiNode* node, const aiScene* scene)
     {
         processNode(node->mChildren[i], scene);
     }
-}
+}*/
 
 Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 {
@@ -123,6 +153,56 @@ void Model::ProcessFaces(aiMesh* mesh, std::vector<unsigned int>& indices)
 void Model::ProcessVertices(aiMesh* mesh, std::vector<Vertex>& vertices)
 {
     //todo: change this part into parallelized method
+    // using openmp
+
+    // Resize the vector to be able to hold all the vertex data
+    vertices.resize(mesh->mNumVertices); 
+
+    // paralleized using openMP
+    #pragma omp parallel for
+    for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+    {
+        Vertex vertex;
+        glm::vec3 vector; // placeholder vector
+
+        // positions
+        vector.x = mesh->mVertices[i].x;
+        vector.y = mesh->mVertices[i].y;
+        vector.z = mesh->mVertices[i].z;
+        vertex.Position = vector;
+
+        // normals
+        if (mesh->HasNormals())
+        {
+            vector.x = mesh->mNormals[i].x;
+            vector.y = mesh->mNormals[i].y;
+            vector.z = mesh->mNormals[i].z;
+            vertex.Normal = vector;
+        }
+
+        // texture coordinates
+        if (mesh->mTextureCoords[0]) // does the mesh contain texture coordinates?
+        {
+            // a vertex can contain up to 8 different texture coordinates. We take the first set (0).
+            vertex.TexCoords = glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
+
+            // tangent
+            vertex.Tangent = glm::vec3(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
+
+            // bitangent
+            vertex.Bitangent = glm::vec3(mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z);
+        }
+        else
+        {
+            vertex.TexCoords = glm::vec2(0.0f, 0.0f);
+        }
+
+        vertices[i] = vertex; // 
+    }
+
+
+
+    /* origin Source.
     // walk through each of the mesh's vertices
     for (unsigned int i = 0; i < mesh->mNumVertices; i++)
     {
@@ -166,6 +246,7 @@ void Model::ProcessVertices(aiMesh* mesh, std::vector<Vertex>& vertices)
 
         vertices.push_back(vertex);
     }
+    */
 }
 
 // checks all material textures of a given type and loads the textures if they're not loaded yet.
