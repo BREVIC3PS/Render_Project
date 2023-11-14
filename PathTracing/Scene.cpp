@@ -58,66 +58,78 @@ bool Scene::trace(
 }
 
 // Implementation of Path Tracing
-// Implementation of Path Tracing
 Vector3f Scene::castRay(const Ray& ray, int depth) const
 {
-    // TO DO Implement Path Tracing Algorithm here
-    Vector3f L_dir;
-    Vector3f L_indir;
+    //create variables to stores dir and indir light
+    Vector3f dir = { 0.0,0.0,0.0 };
+    Vector3f indir = { 0.0,0.0,0.0 };
 
-    // 从像素发出的光线与物体的交点
-    Intersection obj_inter = intersect(ray);
-    if (!obj_inter.happened)
-        return L_dir;
+    //1.Determine if there is an intersection: Does the light intersect with the object in the scene?
+    Intersection inter = Scene::intersect(ray);
+    //if no intersection
+    if (!inter.happened) {
+        //will return 0,0,0
+        return dir;
+    }
+    //2.ray hit the light source: The rendering equation only counts the previous self-luminous terms, so it directly returns the self-luminous terms of the material
+    if (inter.m->hasEmission()) {
+        if (depth == 0) {//first time hitting light source
+            return inter.m->getEmission();
+        }
+        else return dir;//bounced light is hitting light source, return 0,0,0
 
-    // 打到光源
-    if (obj_inter.m->hasEmission())
-        return obj_inter.m->getEmission();
+    }
+    //3.ray hits the object: This is the time to start the next step after the pseudo-code(see documment)
 
-    // 打到物体
-    Vector3f p = obj_inter.coords;
-    Material* m = obj_inter.m;
-    Vector3f N = obj_inter.normal.normalized();
-    Vector3f wo = ray.direction; // 像素到物体的向量
+    //The light source in the scene is sampled, and the sampling points light_pos and pdf_light are obtained
+    Intersection light_pos;
+    float pdf_light = 0.0f;
+    sampleLight(light_pos, pdf_light);
 
-    // 有交点，对光源采样
-    // 可以不初始化
-    float pdf; 
-    Intersection light_inter;
-    sampleLight(light_inter, pdf);    // 得到光源位置和对光源采样的pdf
+    //3.1 calculate directional light
 
-    Vector3f x = light_inter.coords;
-    Vector3f ws = (x - p).normalized(); //from object to light source
-    Vector3f NN = light_inter.normal.normalized();
-    Vector3f emit = light_inter.emit;
-    float d = (x - p).norm();
-    // Send light again to see any block happens
-    Ray Obj2Light(p, ws);
-    float d2 = intersect(Obj2Light).distance;
-    // 是否阻挡，利用距离判断，需注意浮点数的处理
-    if (d2 - d > -0.001) {
-        // wo will not be used
-        Vector3f eval = m->eval(wo, ws, N); 
-        float cos_theta = dotProduct(N, ws);
-        // ws从物体指向光源，与NN的夹角大于180
-        float cos_theta_x = dotProduct(NN, -ws);
-        L_dir = emit * eval * cos_theta * cos_theta_x / std::pow(d, 2) / pdf;
+    //some prama of the object
+    Vector3f p = inter.coords;
+    Vector3f N = inter.normal.normalized();
+    Vector3f wo = ray.direction;//from object to scene
+    //some prama of the object
+    Vector3f xx = light_pos.coords;
+    Vector3f NN = light_pos.normal.normalized();
+    Vector3f ws = (p - xx).normalized();//from light source to object
+    float dis = (p - xx).norm();//distance between the object and the light
+    float dis2 = dotProduct((p - xx), (p - xx));
+
+    //Determine whether there is a block between the light source and the object:
+    //Emits a ray in the direction of ws light source xx -> object p
+    Ray light_to_obj(xx, ws);//Ray(orig,dir)
+    Intersection light_to_scene = Scene::intersect(light_to_obj);
+    //If dis>light_to_scene.distance indicates that there is a block, then the reverse condition can be given:
+    if (light_to_scene.happened && (light_to_scene.distance - dis > -EPSILON)) {//no block
+        //set some parameters
+        Vector3f L_i = light_pos.emit;//light intensity
+        Vector3f f_r = inter.m->eval(wo, -ws, N);//BRDF == material
+        float cos_theta = dotProduct(-ws, N);//Object Angle
+        float cos_theta_l = dotProduct(ws, NN);//Light Angle
+        dir = L_i * f_r * cos_theta * cos_theta_l / dis2 / pdf_light;
     }
 
-    // L_indir
-    float P_RR = get_random_float();
-    if (P_RR < RussianRoulette) {
-        Vector3f wi = m->sample(wo, N).normalized();
+    //3.2 indirectional light
+
+    //RussianRoulette
+    //P_RR:RussianRoulette=0.8
+    float ksi = get_random_float();//Randomly pick[0,1]
+    if (ksi < RussianRoulette) {
+        //Randomly set a direction wi
+        Vector3f wi = inter.m->sample(wo, N).normalized();//In this case, the wi is not involved in the calculation and returns a random direction
         Ray r(p, wi);
-        Intersection inter = intersect(r);
-        // 判断打到的物体是否会发光取决于m
-        if (inter.happened && !inter.m->hasEmission()) {
-            Vector3f eval = m->eval(wo, wi, N);
-            float pdf_O = m->pdf(wo, wi, N);
+        Intersection obj_to_scene = Scene::intersect(r);
+        //Hit the object &&The object was not a light source
+        if (obj_to_scene.happened && !obj_to_scene.m->hasEmission()) {
+            Vector3f f_r = inter.m->eval(wo, wi, N);//wo is not involved in the calculation
             float cos_theta = dotProduct(wi, N);
-            L_indir = castRay(r, depth + 1) * eval * cos_theta / pdf_O / RussianRoulette;
+            float pdf_hemi = inter.m->pdf(wo, wi, N);
+            indir = castRay(r, depth + 1) * f_r * cos_theta / pdf_hemi / RussianRoulette;
         }
     }
-    //4->16min
-    return L_dir + L_indir;
+    return dir + indir;
 }

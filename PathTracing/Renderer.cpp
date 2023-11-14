@@ -7,7 +7,7 @@
 
 inline float deg2rad(const float& deg) { return deg * M_PI / 180.0; }
 
-const float EPSILON = 0.00001;
+const float EPSILON = 0.0001;
 
 // The main render function. This where we iterate over all pixels in the image,
 // generate primary rays and cast these rays into the scene. The content of the
@@ -22,7 +22,7 @@ void Renderer::Render(const Scene& scene)
     int m = 0;
     int tid;
     // change the spp value to change sample ammount
-    int spp = 128;
+    int spp = 256;
     std::cout << "SPP: " << spp << "\n";
     // each thread is responsible for one pixel? -> No! it is impossible to create so many threads
     // each thread is responsible for pixel_number/thread_number pixels
@@ -43,7 +43,6 @@ void Renderer::Render(const Scene& scene)
             float y = (1 - 2 * (j + 0.5) / (float)scene.height) * scale;
 
             Vector3f dir = normalize(Vector3f(x, y, 1));
-#pragma omp parallel for
             for (int k = 0; k < spp; k++) {
                 framebuffer[pixel] += scene.castRay(Ray(eye_pos, dir), 0) / spp;
             }

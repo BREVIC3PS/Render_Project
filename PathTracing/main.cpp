@@ -14,8 +14,8 @@ int main(int argc, char** argv)
 {
 
     // Change the definition here to change resolution
-    int width = 1024;
-    int height = 768;
+    int width = 256;
+    int height = 256;
     Scene scene(width, height);
     std::cout << "Image Size: " << width * height << std::endl;
     Material* red = new Material(DIFFUSE, Vector3f(0.0f));
@@ -28,33 +28,60 @@ int main(int argc, char** argv)
     light->Kd = Vector3f(0.65f);
 
     MeshTriangle floor("../models/cornellbox/floor.obj", white);
-    //MeshTriangle shortbox("../models/cornellbox/shortbox.obj", white);
+    //MeshTriangle shortbox("../models/cornellbox/shortbox.obj", white, Vector3f(0, 0,0 ), Vector3f(1, 1, 1));
     //MeshTriangle tallbox("../models/cornellbox/tallbox.obj", white);
-    MeshTriangle bunny("..//models/Scaniverse/Scaniverse.obj", white, Vector3f(250, 0,220 ),Vector3f(220, 220, 220));
+    //MeshTriangle bunny("..//models/BMW M8 Competition Widebody/M8C.obj", white, Vector3f(250, 30,300 ),Vector3f(100, 100, 100), 45);
+    MeshTriangle bunny("..//models/bunny/bunny.obj", white, Vector3f(250, 0, 220), Vector3f(2000, 2000, 2000),180);
     MeshTriangle left("../models/cornellbox/left.obj", red);
     MeshTriangle right("../models/cornellbox/right.obj", green);
     MeshTriangle light_("../models/cornellbox/light.obj", light);
 
     scene.Add(&floor);
-    //scene.Add(&shortbox);
-    //scene.Add(&tallbox);
+    /*scene.Add(&shortbox);
+    scene.Add(&tallbox);*/
     scene.Add(&bunny);
     scene.Add(&left);
     scene.Add(&right);
     scene.Add(&light_);
 
-    scene.buildBVH();
+    char op = 'n';
+    float distance = 0;
 
-    Renderer r;
+    while(op)
+    {
+        switch (op)
+        {
+        case 'x':
+            bunny.move(Vector3f(distance, 0, 0));
+            break;
+        case 'y':
+            bunny.move(Vector3f(0, distance, 0));
+            break;
+        case 'z':
+            bunny.move(Vector3f(0, 0, distance));
+            break;
+        case 's':
+            bunny.scale(Vector3f(distance, distance, distance));
+        case 'r':
+            bunny.rotate(distance);
+        default:
+            break;
+        }
+        scene.buildBVH();
+        Renderer r;
 
-    auto start = std::chrono::system_clock::now();
-    r.Render(scene);
-    auto stop = std::chrono::system_clock::now();
 
-    std::cout << "Render complete: \n";
-    std::cout << "Time taken: " << std::chrono::duration_cast<std::chrono::hours>(stop - start).count() << " hours\n";
-    std::cout << "          : " << std::chrono::duration_cast<std::chrono::minutes>(stop - start).count() << " minutes\n";
-    std::cout << "          : " << std::chrono::duration_cast<std::chrono::seconds>(stop - start).count() << " seconds\n";
+        auto start = std::chrono::system_clock::now();
+        r.Render(scene);
+        auto stop = std::chrono::system_clock::now();
+
+        std::cout << "Render complete: \n";
+        std::cout << "Time taken: " << std::chrono::duration_cast<std::chrono::hours>(stop - start).count() << " hours\n";
+        std::cout << "          : " << std::chrono::duration_cast<std::chrono::minutes>(stop - start).count() << " minutes\n";
+        std::cout << "          : " << std::chrono::duration_cast<std::chrono::seconds>(stop - start).count() << " seconds\n";
+        std::cout << bunny.bounding_box.pMin <<std::endl<< bunny.bounding_box.pMax << '\n';
+        std::cin >> op >> distance;
+    }
 
     return 0;
 }

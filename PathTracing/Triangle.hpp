@@ -90,56 +90,74 @@ class MeshTriangle : public Object
 {
 public:
     MeshTriangle(const std::string& filename, Material* mt = new Material(),
-        Vector3f Trans = Vector3f(0.0, 0.0, 0.0), Vector3f Scale = Vector3f(1.0, 1.0, 1.0))
+        Vector3f Trans = Vector3f(0.0, 0.0, 0.0), Vector3f Scale = Vector3f(1.0, 1.0, 1.0), float Rotate = 0.f)
     {
         objl::Loader loader;
         loader.LoadFile(filename);
         area = 0;
         m = mt;
         //assert(loader.LoadedMeshes.size() == 1);
-        auto mesh = loader.LoadedMeshes[0];
-
-        Vector3f min_vert = Vector3f{ std::numeric_limits<float>::infinity(),
+        min_vert = Vector3f{ std::numeric_limits<float>::infinity(),
                                      std::numeric_limits<float>::infinity(),
                                      std::numeric_limits<float>::infinity() };
-        Vector3f max_vert = Vector3f{ -std::numeric_limits<float>::infinity(),
+        max_vert = Vector3f{ -std::numeric_limits<float>::infinity(),
                                      -std::numeric_limits<float>::infinity(),
                                      -std::numeric_limits<float>::infinity() };
-        //todo: parallelization
-        for (int i = 0; i < mesh.Vertices.size(); i += 3) {
-            //if (mesh.Vertices.size()-1 - i < 3)break;
-            std::array<Vector3f, 3> face_vertices;
 
-            for (int j = 0; j < 3; j++) {
-                auto vert = Vector3f(mesh.Vertices[i + j].Position.X,
-                    mesh.Vertices[i + j].Position.Y,
-                    mesh.Vertices[i + j].Position.Z);
-                vert = Scale * vert + Trans;
-                face_vertices[j] = vert;
+        for (auto mesh : loader.LoadedMeshes)
+        {
+            //todo: parallelization
+#pragma omp parallel for
+            for (int i = 0; i < mesh.Vertices.size(); i += 3) {
+                if (mesh.Vertices.size() - i < 3)break;
+                std::array<Vector3f, 3> face_vertices;
 
-                min_vert = Vector3f(std::min(min_vert.x, vert.x),
-                    std::min(min_vert.y, vert.y),
-                    std::min(min_vert.z, vert.z));
-                max_vert = Vector3f(std::max(max_vert.x, vert.x),
-                    std::max(max_vert.y, vert.y),
-                    std::max(max_vert.z, vert.z));
+                for (int j = 0; j < 3; j++) {
+                    auto vert = Vector3f(mesh.Vertices[i + j].Position.X,
+                        mesh.Vertices[i + j].Position.Y,
+                        mesh.Vertices[i + j].Position.Z);
+                    RotateVertex(vert, Rotate);
+                    vert = Scale * vert + Trans;
+                    face_vertices[j] = vert;
+#pragma omp critical
+                    UpdateVert(vert);
+                }
+#pragma omp critical
+                {
+                    triangles.emplace_back(face_vertices[0], face_vertices[1],
+                        face_vertices[2], mt);
+                }
             }
 
-            triangles.emplace_back(face_vertices[0], face_vertices[1],
-                face_vertices[2], mt);
-        }
 
-        bounding_box = Bounds3(min_vert, max_vert);
-
-        std::vector<Object*> ptrs;
-        for (auto& tri : triangles) {
-            ptrs.push_back(&tri);
-            area += tri.area;
         }
-        bvh = new BVHAccel(ptrs);
+            for (auto& tri : triangles) {
+                ptrs.push_back(&tri);
+                area += tri.area;
+            }
+            bounding_box = Bounds3(min_vert, max_vert);
+            bvh = new BVHAccel(ptrs);
+
     }
 
     
+    void UpdateVert(const Vector3f &vert)
+    {
+        min_vert = Vector3f(std::min(min_vert.x, vert.x),
+            std::min(min_vert.y, vert.y),
+            std::min(min_vert.z, vert.z));
+        max_vert = Vector3f(std::max(max_vert.x, vert.x),
+            std::max(max_vert.y, vert.y),
+            std::max(max_vert.z, vert.z));
+    }
+    void UpdateBVH()
+    {
+        bounding_box.pMin = min_vert;
+        bounding_box.pMax = max_vert;
+
+        delete bvh;
+        bvh = new BVHAccel(ptrs);
+    }
 
     bool intersect(const Ray& ray) { return true; }
 
@@ -212,6 +230,66 @@ public:
         return m->hasEmission();
     }
 
+    void move(Vector3f distance)
+    {
+        Trans += distance;
+#pragma omp parallel for
+        for (int i = 0; i < triangles.size();i++) {
+            triangles[i].v0 += distance;
+            triangles[i].v1 += distance;
+            triangles[i].v2 += distance;
+        }
+        min_vert += distance;
+        max_vert += distance;
+        UpdateBVH();
+    }
+
+    void scale(Vector3f Scale)
+    {
+        this->Scale = this->Scale * Scale;
+#pragma omp parallel for
+        
+        for (int i = 0; i < triangles.size(); i++) {
+            triangles[i].v0 = (triangles[i].v0 - Trans) * Scale + Trans;
+            triangles[i].v1 = (triangles[i].v1 - Trans) * Scale + Trans;
+            triangles[i].v2 = (triangles[i].v2 - Trans) * Scale + Trans;
+            triangles[i].area = triangles[i].area * Scale.x * Scale.x;
+        }
+        
+        min_vert = min_vert * Scale;
+        max_vert = max_vert * Scale;
+        UpdateBVH(); 
+    }
+
+    // rotate around y axis
+    void rotateTriangle(float angle, Triangle& t, Vector3f axis = (0, 1, 0))
+    {
+        RotateVertex(t.v0, angle);
+        RotateVertex(t.v1, angle);
+        RotateVertex(t.v2, angle);
+    }
+
+    void RotateVertex(Vector3f& v, float angle)
+    {
+        angle = angle * M_PI / 180.0;
+        v.x = cos(angle) * v.x + sin(angle) * v.z;
+        v.z = -sin(angle) * v.x + cos(angle) * v.z;
+    }
+
+    void rotate(float angle, Vector3f axis = (0,1,0))
+    {
+#pragma omp parallel for
+        for (int i = 0; i < triangles.size(); i++) {
+            triangles[i].v0 = triangles[i].v0 - Trans ;
+            triangles[i].v1 = triangles[i].v1 - Trans;
+            triangles[i].v2 = triangles[i].v2 - Trans;
+            rotateTriangle(angle, triangles[i], axis);
+            triangles[i].v0 = triangles[i].v0 + Trans;
+            triangles[i].v1 = triangles[i].v1 + Trans;
+            triangles[i].v2 = triangles[i].v2 + Trans;
+        }
+    }
+
     Bounds3 bounding_box;
     std::unique_ptr<Vector3f[]> vertices;
     uint32_t numTriangles;
@@ -223,8 +301,10 @@ public:
     Vector3f Scale;
     BVHAccel* bvh;
     float area;
-
+    Vector3f min_vert;
+    Vector3f max_vert;
     Material* m;
+    std::vector<Object*> ptrs;
 };
 
 inline bool Triangle::intersect(const Ray& ray) { return true; }

@@ -24,6 +24,7 @@ inline int leafNodes, totalLeafNodes, totalPrimitives, interiorNodes;
 class BVHAccel {
 
 public:
+    void DestoryBVH(BVHBuildNode* root);
     // BVHAccel Public Types
     enum class SplitMethod { NAIVE, SAH };
 

@@ -2,6 +2,19 @@
 #include <cassert>
 #include "BVH.hpp"
 
+void BVHAccel::DestoryBVH(BVHBuildNode* root)
+{
+    if (root)
+    {
+        if (root->left)
+            DestoryBVH(root->left);
+        if (root->right)
+            DestoryBVH(root->right);
+        root->object = nullptr;
+        delete root;
+    }
+}
+
 BVHAccel::BVHAccel(std::vector<Object*> p, int maxPrimsInNode,
                    SplitMethod splitMethod)
     : maxPrimsInNode(std::min(255, maxPrimsInNode)), splitMethod(splitMethod),
@@ -23,6 +36,11 @@ BVHAccel::BVHAccel(std::vector<Object*> p, int maxPrimsInNode,
     printf(
         "\rBVH Generation complete: \nTime Taken: %i hrs, %i mins, %i secs\n\n",
         hrs, mins, secs);
+}
+
+BVHAccel::~BVHAccel()
+{
+    DestoryBVH(root);
 }
 
 BVHBuildNode* BVHAccel::recursiveBuild(std::vector<Object*> objects)
@@ -107,24 +125,23 @@ Intersection BVHAccel::Intersect(const Ray& ray) const
 
 Intersection BVHAccel::getIntersection(BVHBuildNode* node, const Ray& ray) const
 {
-    // TODO Traverse the BVH to find intersection
-    std::array<int, 3> dirIsNeg;
-    dirIsNeg[0] = (ray.direction[0] > 0);
-    dirIsNeg[1] = (ray.direction[1] > 0);
-    dirIsNeg[2] = (ray.direction[2] > 0);
-    Intersection inter;
+    Intersection res;
+    std::array<int, 3>dirIsNeg = { int(ray.direction.x < 0), int(ray.direction.y < 0), int(ray.direction.z < 0) };
+    //No Intersection
     if (!node->bounds.IntersectP(ray, ray.direction_inv, dirIsNeg)) {
-        return inter;
+        return res;
     }
+    //Has Intersection
+    //No child
     if (node->left == nullptr && node->right == nullptr) {
-        return node->object->getIntersection(ray);
+        res = node->object->getIntersection(ray);
+        return res;
     }
-
-    Intersection l = getIntersection(node->left, ray);
-    Intersection r = getIntersection(node->right, ray);
-    return l.distance < r.distance ? l : r;
-
-    return inter;
+    //Has child -> recursion
+    Intersection left, right;
+    left = getIntersection(node->left, ray);
+    right = getIntersection(node->right, ray);
+    return left.distance < right.distance ? left : right;
 }
 
 
