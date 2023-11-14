@@ -46,7 +46,7 @@ public:
 
         return true;
     }
-    Intersection getIntersection(Ray ray){
+    Intersection getIntersection(Ray ray) {
         Intersection result;
         result.happened = false;
         Vector3f L = ray.origin - center;
@@ -57,21 +57,25 @@ public:
         if (!solveQuadratic(a, b, c, t0, t1)) return result;
         if (t0 < 0) t0 = t1;
         if (t0 < 0) return result;
-        result.happened=true;
+        if (t0 > 0.5)
+        {
+            result.happened = true;
+            result.coords = Vector3f(ray.origin + ray.direction * t0);
+            result.normal = normalize(Vector3f(result.coords - center));
+            result.m = this->m;
+            result.obj = this;
+            result.distance = t0;
+        }
 
-        result.coords = Vector3f(ray.origin + ray.direction * t0);
-        result.normal = normalize(Vector3f(result.coords - center));
-        result.m = this->m;
-        result.obj = this;
-        result.distance = t0;
         return result;
 
     }
+
     void getSurfaceProperties(const Vector3f &P, const Vector3f &I, const uint32_t &index, const Vector2f &uv, Vector3f &N, Vector2f &st) const
     { N = normalize(P - center); }
 
     Vector3f evalDiffuseColor(const Vector2f &st)const {
-        //return m->getColor();
+        return m->getColor();
     }
     Bounds3 getBounds(){
         return Bounds3(Vector3f(center.x-radius, center.y-radius, center.z-radius),

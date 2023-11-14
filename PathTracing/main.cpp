@@ -14,8 +14,9 @@ int main(int argc, char** argv)
 {
 
     // Change the definition here to change resolution
-    int width = 256;
-    int height = 256;
+    int width = 512;
+    int height = 512;
+    int spp = 32;
     Scene scene(width, height);
     std::cout << "Image Size: " << width * height << std::endl;
     Material* red = new Material(DIFFUSE, Vector3f(0.0f));
@@ -26,19 +27,33 @@ int main(int argc, char** argv)
     white->Kd = Vector3f(0.725f, 0.71f, 0.68f);
     Material* light = new Material(DIFFUSE, (8.0f * Vector3f(0.747f+0.058f, 0.747f+0.258f, 0.747f) + 15.6f * Vector3f(0.740f+0.287f,0.740f+0.160f,0.740f) + 18.4f *Vector3f(0.737f+0.642f,0.737f+0.159f,0.737f)));
     light->Kd = Vector3f(0.65f);
+    Material* microfacet = new Material(MICROFACET, Vector3f(0.0f));
+    microfacet->Ks = Vector3f(0.45, 0.45, 0.45);
+    microfacet->Kd = Vector3f(0.3, 0.3, 0.25);
+    microfacet->ior = 12.85;
+    Material* mirror = new Material(MIRROR, Vector3f(0.0f));
+    mirror->Ks = Vector3f(0.45, 0.45, 0.45);
+    mirror->Kd = Vector3f(0.3, 0.3, 0.25);
+    mirror->ior = 12.85;
+
+    Sphere sphere1(Vector3f(150, 100, 200), 100, microfacet);
+
 
     MeshTriangle floor("../models/cornellbox/floor.obj", white);
-    //MeshTriangle shortbox("../models/cornellbox/shortbox.obj", white, Vector3f(0, 0,0 ), Vector3f(1, 1, 1));
-    //MeshTriangle tallbox("../models/cornellbox/tallbox.obj", white);
+    MeshTriangle shortbox("../models/cornellbox/shortbox.obj", mirror);
+    MeshTriangle tallbox("../models/cornellbox/tallbox.obj", mirror);
+    //MeshTriangle bunny("..//models/2021-lamborghini-countach-lpi-800-4/Lamborghini_Countach_LP800.obj", microfacet, Vector3f(350, 80,200 ),Vector3f(55, 55, 55), 45);
     //MeshTriangle bunny("..//models/BMW M8 Competition Widebody/M8C.obj", white, Vector3f(250, 30,300 ),Vector3f(100, 100, 100), 45);
-    MeshTriangle bunny("..//models/bunny/bunny.obj", white, Vector3f(250, 0, 220), Vector3f(2000, 2000, 2000),180);
+    //MeshTriangle bunny("..//models/bunny/bunny.obj", white, Vector3f(250, 0, 220), Vector3f(2000, 2000, 2000),180);
+    MeshTriangle bunny("..//models/su-33-flanker-d/Su-33 Flanker-D.obj", microfacet, Vector3f(250, 0, 220), Vector3f(70, 70, 70), 45);
     MeshTriangle left("../models/cornellbox/left.obj", red);
     MeshTriangle right("../models/cornellbox/right.obj", green);
     MeshTriangle light_("../models/cornellbox/light.obj", light);
 
+    //scene.Add(&sphere1);
     scene.Add(&floor);
-    /*scene.Add(&shortbox);
-    scene.Add(&tallbox);*/
+    //scene.Add(&shortbox);
+    //scene.Add(&tallbox);
     scene.Add(&bunny);
     scene.Add(&left);
     scene.Add(&right);
@@ -72,7 +87,7 @@ int main(int argc, char** argv)
 
 
         auto start = std::chrono::system_clock::now();
-        r.Render(scene);
+        r.Render(scene, spp);
         auto stop = std::chrono::system_clock::now();
 
         std::cout << "Render complete: \n";

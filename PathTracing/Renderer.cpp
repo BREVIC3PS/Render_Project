@@ -7,12 +7,12 @@
 
 inline float deg2rad(const float& deg) { return deg * M_PI / 180.0; }
 
-const float EPSILON = 0.0001;
+const float EPSILON = 0.00001;
 
 // The main render function. This where we iterate over all pixels in the image,
 // generate primary rays and cast these rays into the scene. The content of the
 // framebuffer is saved to a file.
-void Renderer::Render(const Scene& scene)
+void Renderer::Render(const Scene& scene, int spp)
 {
     std::vector<Vector3f> framebuffer(scene.width * scene.height);
 
@@ -22,7 +22,6 @@ void Renderer::Render(const Scene& scene)
     int m = 0;
     int tid;
     // change the spp value to change sample ammount
-    int spp = 256;
     std::cout << "SPP: " << spp << "\n";
     // each thread is responsible for one pixel? -> No! it is impossible to create so many threads
     // each thread is responsible for pixel_number/thread_number pixels
