@@ -10,6 +10,11 @@ Working in Progress!
 
 ![image](https://github.com/BREVIC3PS/Render_Project/blob/master/PathTracing/Demo/2.png)
 
+## Path-Tracing CUDA
+# Overview
+![image](https://github.com/BREVIC3PS/Render_Project/blob/master/PathTracing/Overview.png)
+For more information, please check the presentation slide (Project_Presentation_KyuhyeonNam_KeWang_v0.1.pptx)
+
 ### Usage (For PathTracing):
 ```
 cd PathTracing
@@ -18,5 +23,16 @@ cd build
 cmake ..
 make (or cmake --build . -j)
 ./RayTracing (Or manually run RayTracing.exe)
+see the result -> binary.ppm
+```
+
+### Usage (For PathTracing_CUDA):
+```
+cd PathTracing_CUDA
+mkdir build
+cd build
+cmake ..
+make (or cmake --build . -j)
+./RayTracing (Or manually run CUDA_Path_Tracing.exe)
 see the result -> binary.ppm
 ```
