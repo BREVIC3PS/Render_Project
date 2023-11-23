@@ -10,9 +10,11 @@ Working in Progress!
 
 ![image](https://github.com/BREVIC3PS/Render_Project/blob/master/PathTracing/Demo/2.png)
 
+![image](https://github.com/BREVIC3PS/Render_Project/blob/master/PathTracing/Demo/result.jpg)
+
 ## Path-Tracing CUDA
 # Overview
-![image](https://github.com/BREVIC3PS/Render_Project/blob/master/PathTracing/Overview.png)
+![image](https://github.com/BREVIC3PS/Render_Project/Overview.png)
 For more information, please check the presentation slide (Project_Presentation_KyuhyeonNam_KeWang_v0.1.pptx)
 
 ### Usage (For PathTracing):
