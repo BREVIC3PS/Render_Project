@@ -18,10 +18,6 @@ void check_cuda(cudaError_t result, char const *const func, const char *const fi
     }
 }
 
-#define CELL_X_NUM 32 // cell number in x axis
-#define CELL_Y_NUM 32 // cell number in y axis
-
-
 // CPU Memory
 static dim3 blocks;
 static dim3 threads;
@@ -81,10 +77,10 @@ __device__ void Triangle::CudaSample (Intersection &pos, float &pdf, curandState
 
 
 
-void InitRender(Scene* scene) {
+void InitRender(Scene* scene, int GrimNumX, int GridNumY) {
 
     // thread limit per block is 1024
-    blocks = dim3(CELL_X_NUM, CELL_Y_NUM);
+    blocks = dim3(GrimNumX, GridNumY);
     threads = dim3((scene->width + blocks.x - 1) / blocks.x,
                    (scene->height + blocks.y - 1) / blocks.y);
 
@@ -279,7 +275,7 @@ __device__ Vector3f CalcColor(int pid, int bvhElemNum, int triangleNum,
 
     Ray curRay = rays[pid];
     Vector3f pixelColor = Vector3f(0,0,0);
-    int maxDepth = 3;  // maxDepth cannot exceed stackSize/2
+    int maxDepth = 10;  // maxDepth cannot exceed stackSize/2
     float RussianRoulette = 0.8;
 
     Vector3f vstack[32];
@@ -288,9 +284,7 @@ __device__ Vector3f CalcColor(int pid, int bvhElemNum, int triangleNum,
     }
 
 
-    // 这里用stack实现递归，stack内部：
-    // 0，1： depth = 0时， in_dir 的颜色 + dir color 需要的系数
-    // 2，3： depth = 1时， in_dir 的颜色 + dir color 需要的系数， 以此类推
+    //use stack to implement recursion, each depth takes 2 elements of the stack
     int curDepth = 0;
     for (int d = 0; d <= maxDepth; d++) {
 
@@ -302,15 +296,16 @@ __device__ Vector3f CalcColor(int pid, int bvhElemNum, int triangleNum,
         }
 
         if (intersection.m != NULL && intersection.m->cudaHasEmission()) {
-            vstack[d*2+0] = Vector3f(1.0,1.0,1.0);
+            vstack[d*2+0] = Vector3f(1.0,1.0,1.0);//means the ray hits the light source directly
             break;
         }
 
+        // otherwise, it hits some objects in the scene
         // contribution from the light source
         Vector3f dir_color = Vector3f(0, 0, 0);
         float pdf_light;
         Intersection lightPoint;
-        sampleLight(lightPoint, pdf_light, triangleNum, pid, triangles, state);
+        sampleLight(lightPoint, pdf_light, triangleNum, pid, triangles, state);//assume only one light source
         lightPoint.normal.normalized();
 
         Vector3f w_dir = normalize(lightPoint.coords - intersection.coords);
@@ -408,31 +403,31 @@ __global__ void GenerateRay(int width, int height, double fov, float* fb, Ray* r
     }
 }
 
-__global__ void CastRay(int width, int height, float* fb, Ray* rays,
+__global__ void CastRay(int width, int height, float* frameBuffer, Ray* rays,int spp,
                         int bvhElemNum, int triangleNum,
                         BVHElem* bvhElems, Triangle* triangles, Bounds3* bounds, Material* materials,
                         curandState *state) {
-    int spp = 16;
+    //int spp = 128;
 
     int i = (blockIdx.x * blockDim.x) + threadIdx.x;
     int j = (blockIdx.y * blockDim.y) + threadIdx.y;
 
     if (i < width && j < height) {
         int pixelIdx = i + (j * width);
-        fb[pixelIdx*3+0] = 0;
-        fb[pixelIdx*3+1] = 0;
-        fb[pixelIdx*3+2] = 0;
+        frameBuffer[pixelIdx*3+0] = 0;
+        frameBuffer[pixelIdx*3+1] = 0;
+        frameBuffer[pixelIdx*3+2] = 0;
         for (int time = 0; time < spp; time++) {
             Vector3f c = CalcColor(pixelIdx, bvhElemNum, triangleNum,
                                    rays, bvhElems, triangles, bounds, materials, state);
-            fb[pixelIdx*3+0] += c.x;
-            fb[pixelIdx*3+1] += c.y;
-            fb[pixelIdx*3+2] += c.z;
+            frameBuffer[pixelIdx*3+0] += c.x;//R
+            frameBuffer[pixelIdx*3+1] += c.y;//G
+            frameBuffer[pixelIdx*3+2] += c.z;//B
         }
 
-        fb[pixelIdx*3+0] /= (float) spp;
-        fb[pixelIdx*3+1] /= (float) spp;
-        fb[pixelIdx*3+2] /= (float) spp;
+        frameBuffer[pixelIdx*3+0] /= (float) spp;
+        frameBuffer[pixelIdx*3+1] /= (float) spp;
+        frameBuffer[pixelIdx*3+2] /= (float) spp;
 
 
     }
@@ -445,7 +440,7 @@ __global__ void SetTriangleValue(int triangleNum, Triangle* triangles, Material*
     }
 }
 
-void Render() {
+void Render(int spp) {
 
     SetKernelRand<<<blocks, threads>>>(devStates, scene_host->height, scene_host->width);
     SetTriangleValue<<<blocks, threads>>>(num_triangles, triangle_dev, material_dev);
@@ -455,7 +450,7 @@ void Render() {
     checkCudaErrors(cudaDeviceSynchronize());
 
     CastRay<<<blocks, threads>>>(scene_host->width, scene_host->height, frameBuffer,
-                                 ray_dev,num_bvhElems, num_triangles,
+                                 ray_dev, spp, num_bvhElems, num_triangles,
                                  bvhElem_dev, triangle_dev, bound_dev, material_dev,
                                  devStates);
 

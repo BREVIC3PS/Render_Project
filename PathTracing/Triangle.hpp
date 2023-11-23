@@ -90,7 +90,8 @@ class MeshTriangle : public Object
 {
 public:
     MeshTriangle(const std::string& filename, Material* mt = new Material(),
-        Vector3f Trans = Vector3f(0.0, 0.0, 0.0), Vector3f Scale = Vector3f(1.0, 1.0, 1.0), float Rotate = 0.f)
+        Vector3f Trans = Vector3f(0.0, 0.0, 0.0), Vector3f Scale = Vector3f(1.0, 1.0, 1.0), float Rotate = 0.f, 
+        Vector3f xr = Vector3f(1.0, 0, 0), Vector3f yr = Vector3f(0, 1.0, 0), Vector3f zr = Vector3f(0, 0, 1))
     {
         objl::Loader loader;
         loader.LoadFile(filename);
@@ -117,7 +118,10 @@ public:
                         mesh.Vertices[i + j].Position.Y,
                         mesh.Vertices[i + j].Position.Z);
                     RotateVertex(vert, Rotate);
-                    vert = Scale * vert + Trans;
+                    //vert.x = dotProduct(vert, xr);
+                    //vert.y = dotProduct(vert, yr);
+                    //vert.z = dotProduct(vert, zr);//Ðý×ª
+                    vert = Scale * vert + Trans;//Æ½ÒÆ£¬Ëõ·Å
                     face_vertices[j] = vert;
 #pragma omp critical
                     UpdateVert(vert);

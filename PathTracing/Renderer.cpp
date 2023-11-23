@@ -7,7 +7,7 @@
 
 inline float deg2rad(const float& deg) { return deg * M_PI / 180.0; }
 
-const float EPSILON = 0.00001;
+const float EPSILON = 0.000001;
 
 // The main render function. This where we iterate over all pixels in the image,
 // generate primary rays and cast these rays into the scene. The content of the
@@ -41,7 +41,7 @@ void Renderer::Render(const Scene& scene, int spp)
             float x = (2 * (i + 0.5) / (float)scene.width - 1) * imageAspectRatio * scale;
             float y = (1 - 2 * (j + 0.5) / (float)scene.height) * scale;
 
-            Vector3f dir = normalize(Vector3f(x, y, 1));
+            Vector3f dir = normalize(Vector3f(-x, y, 1));
             for (int k = 0; k < spp; k++) {
                 framebuffer[pixel] += scene.castRay(Ray(eye_pos, dir), 0) / spp;
             }

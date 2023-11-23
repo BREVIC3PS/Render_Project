@@ -48,6 +48,7 @@ public:
 
     MeshTriangle(const std::string& filename, Material *mt = new Material())
     {
+        std::cout << " - loading " << filename << " into scene..." << std::endl;
         objl::Loader loader;
         loader.LoadFile(filename);
         area = 0;

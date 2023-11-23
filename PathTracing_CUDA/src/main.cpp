@@ -9,7 +9,13 @@ int main(int argc, char** argv)
 {
 //    cuda_main();
     // Change the definition here to change resolution
-    Scene scene(512, 512); //784
+    int width = 512;
+    int height = 512;
+    int spp = 64;//sample points
+    int GrimNumX = 64; 
+    int GridNumY = 64;
+    std::cout << "width = " << width << std::endl << "height = " << height << std::endl << "spp = " << spp << std::endl;
+    Scene scene(width, height);
 
     Material* red = new Material(DIFFUSE, Vector3f(0.0f));
     red->Kd = Vector3f(0.63f, 0.065f, 0.05f);
@@ -34,6 +40,7 @@ int main(int argc, char** argv)
     MeshTriangle left("../models/cornellbox/left.obj", red);
     MeshTriangle right("../models/cornellbox/right.obj", green);
     MeshTriangle light_("../models/cornellbox/light.obj", light);
+    //MeshTriangle Nefertiti("../models/Nefertiti.obj/Nefertiti.obj", white);
 
     scene.Add(&floor);
     scene.Add(&shortbox);
@@ -41,15 +48,18 @@ int main(int argc, char** argv)
     scene.Add(&left);
     scene.Add(&right);
     scene.Add(&light_);
+    //scene.Add(&Nefertiti);
 
     scene.buildBVH();
 
-    InitRender(&scene);
+    std::cout << " - Copying memeory to GPU..." << std::endl;
+    InitRender(&scene, GrimNumX, GridNumY);
+    std::cout << " - Copy completed." << std::endl;
 
+    std::cout << " - Starting rendering..." << std::endl;
     auto start = std::chrono::system_clock::now();
-    Render();
+    Render(spp);
     auto stop = std::chrono::system_clock::now();
-
     FreeRender();
 
     std::cout << "Render complete: \n";

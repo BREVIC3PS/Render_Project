@@ -9,9 +9,9 @@
 
 #pragma once
 
-void InitRender(Scene* scene);
+void InitRender(Scene* scene, int GrimNumX, int GridNumY);
 void FreeRender();
-void Render();
+void Render(int spp);
 
 
 #endif //CUDA_PATH_TRACING_RENDERER_H
